@@ -1,0 +1,1560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>FIREMOODON - 350 Levels Snake Arcade</title>
+<style>
+  :root {
+    --fire: #ff3d00;
+    --gold: #ffab00;
+    --cyan: #00e5ff;
+    --green: #00e676;
+    --purple: #d500f9;
+    --bg: #080a10;
+    --card: #121622;
+    --border: #262e45;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+  }
+
+  body, html {
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    color: #fff;
+    overflow: hidden;
+  }
+
+  #app {
+    width: 100%;
+    height: 100%;
+    max-width: 760px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    background: radial-gradient(circle at top, #161b2e 0%, #080a10 100%);
+    border-left: 1px solid #1e2436;
+    border-right: 1px solid #1e2436;
+  }
+
+  /* Header Bar */
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 14px;
+    background: #0b0e17;
+    border-bottom: 2px solid var(--fire);
+    flex-shrink: 0;
+  }
+
+  .logo {
+    font-weight: 900;
+    font-size: 1.15rem;
+    letter-spacing: 1.5px;
+    background: linear-gradient(90deg, var(--fire), var(--gold), #fff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .top-items {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .pill {
+    background: #171c2b;
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.82rem;
+    font-weight: 800;
+  }
+
+  /* Slides Area */
+  .slides-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 14px;
+    overflow-y: auto;
+  }
+
+  .slide.active {
+    display: flex;
+  }
+
+  /* Universal Buttons */
+  .btn {
+    border: none;
+    outline: none;
+    cursor: pointer;
+    padding: 11px 16px;
+    border-radius: 10px;
+    font-weight: 800;
+    font-size: 0.92rem;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    transition: transform 0.1s, filter 0.15s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .btn:active { transform: scale(0.95); }
+  .btn:hover { filter: brightness(1.12); }
+
+  .btn-fire {
+    background: linear-gradient(135deg, var(--fire), var(--gold));
+    box-shadow: 0 4px 14px rgba(255, 61, 0, 0.4);
+  }
+  .btn-cyan {
+    background: linear-gradient(135deg, #0072ff, var(--cyan));
+    box-shadow: 0 4px 14px rgba(0, 229, 255, 0.3);
+  }
+  .btn-green {
+    background: linear-gradient(135deg, #00b248, var(--green));
+    color: #041f0e;
+  }
+  .btn-dark {
+    background: #1b2234;
+    border: 1px solid #313b59;
+  }
+
+  /* SLIDE 1: HOME */
+  .hero-card {
+    margin: auto 0;
+    background: linear-gradient(180deg, rgba(255,61,0,0.14), rgba(18,22,34,0.95));
+    border: 1px solid rgba(255, 171, 0, 0.4);
+    border-radius: 18px;
+    padding: 22px 16px;
+    text-align: center;
+  }
+
+  .hero-title {
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    font-weight: 900;
+    background: linear-gradient(90deg, #ff3d00, #ffab00, #00e676);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .next-box {
+    margin: 14px auto 20px;
+    padding: 10px 14px;
+    background: #0e121d;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    max-width: 460px;
+  }
+
+  .home-btns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 10px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+
+  /* SLIDE 2: SHOP & SKINS */
+  .sec-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .skins-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+
+  .skin-card {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 10px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .skin-card.selected {
+    border-color: var(--gold);
+    box-shadow: 0 0 14px rgba(255, 171, 0, 0.3);
+  }
+
+  .snake-preview {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 0;
+  }
+
+  .seg-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 5px;
+  }
+
+  .upg-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+  }
+
+  .upg-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 12px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .bar-bg {
+    height: 8px;
+    background: #090c14;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--fire), var(--gold));
+  }
+
+  /* SLIDE 3: 350 LEVELS */
+  .ch-tabs {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 10px;
+    flex-shrink: 0;
+  }
+
+  .ch-tab {
+    padding: 7px 12px;
+    background: #171c2b;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: #9ba6c7;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .ch-tab.active {
+    background: linear-gradient(135deg, var(--fire), var(--gold));
+    color: #fff;
+  }
+
+  .lvl-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+    gap: 8px;
+    overflow-y: auto;
+    padding-bottom: 10px;
+  }
+
+  .lvl-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .lvl-card:hover:not(.locked) {
+    border-color: var(--gold);
+  }
+
+  .lvl-card.locked {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  .twist-tag {
+    font-size: 0.7rem;
+    background: rgba(255, 61, 0, 0.16);
+    color: #ffab40;
+    padding: 3px 6px;
+    border-radius: 5px;
+    font-weight: 700;
+  }
+
+  /* SLIDE 4: SNAKE GAME ARENA */
+  #slide-4 {
+    padding: 8px;
+    display: none;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    overflow: hidden;
+  }
+  #slide-4.active { display: flex; }
+
+  .arena-hud {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+
+  .hud-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #111522;
+    border: 1px solid var(--border);
+    padding: 6px 10px;
+    border-radius: 10px;
+    font-size: 0.84rem;
+    font-weight: 800;
+  }
+
+  .twist-strip {
+    background: linear-gradient(90deg, #ff3d00, #ff9100);
+    color: #fff;
+    text-align: center;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.76rem;
+    font-weight: 900;
+    letter-spacing: 0.4px;
+  }
+
+  .canvas-holder {
+    flex: 1;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    position: relative;
+  }
+
+  #snakeCanvas {
+    background: #06080e;
+    border: 2px solid #2b3554;
+    border-radius: 10px;
+    box-shadow: 0 0 25px rgba(0, 229, 255, 0.12);
+    touch-action: none;
+  }
+
+  /* Dedicated Bottom Controller Deck */
+  .control-deck {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 6px;
+    background: #0d111c;
+    border: 1px solid #1f273d;
+    border-radius: 14px;
+    flex-shrink: 0;
+  }
+
+  .dpad {
+    display: grid;
+    grid-template-columns: repeat(3, 48px);
+    grid-template-rows: repeat(2, 44px);
+    gap: 5px;
+  }
+
+  .d-btn {
+    background: #1c243b;
+    border: 1px solid #38466e;
+    border-radius: 10px;
+    color: #fff;
+    font-size: 1.15rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+  }
+
+  .d-btn:active {
+    background: var(--fire);
+    transform: scale(0.92);
+  }
+
+  .action-pad {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .dash-btn {
+    width: 78px;
+    height: 78px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--fire), var(--gold));
+    border: 3px solid #fff;
+    color: #fff;
+    font-weight: 900;
+    font-size: 0.8rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 0 18px rgba(255, 61, 0, 0.5);
+  }
+
+  .dash-btn:active { transform: scale(0.92); }
+
+  /* SLIDE 5: RESULTS */
+  .res-box {
+    margin: auto;
+    width: 100%;
+    max-width: 420px;
+    background: var(--card);
+    border: 2px solid var(--gold);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+  }
+
+  .res-list {
+    margin: 14px 0;
+    background: #0d111a;
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .res-row {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  /* Slide Navigation Footer */
+  .bottom-tabs {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    padding: 7px;
+    background: #07090f;
+    border-top: 1px solid #1b2236;
+    flex-shrink: 0;
+  }
+
+  .b-tab {
+    font-size: 0.72rem;
+    font-weight: 800;
+    padding: 5px 10px;
+    border-radius: 12px;
+    background: #141929;
+    color: #7e8ab0;
+    cursor: pointer;
+  }
+
+  .b-tab.active {
+    background: var(--fire);
+    color: #fff;
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- TOP BAR -->
+  <div class="topbar">
+    <div class="logo">🐍 FIREMOODON SNAKE</div>
+    <div class="top-items">
+      <div class="pill">🪙 <span id="top-coins">0</span></div>
+      <div class="pill">🔓 LVL <span id="top-lvl">1</span>/350</div>
+      <button class="btn btn-dark" id="btn-mute" style="padding:4px 9px; font-size:0.78rem;">🔊 ON</button>
+    </div>
+  </div>
+
+  <!-- 5 SLIDES CONTAINER -->
+  <div class="slides-wrap">
+
+    <!-- SLIDE 1: MAIN MENU -->
+    <div class="slide active" id="slide-1">
+      <div class="hero-card">
+        <div class="hero-title">FIREMOODON</div>
+        <p style="color:#9ba6c7; font-size:0.9rem; margin-top:4px;">350 Twist Levels • Neon Snake Overdrive • All Working Controls</p>
+
+        <div class="next-box">
+          <div style="font-size:0.76rem; color:#8892b0;">CURRENT MISSION</div>
+          <div id="menu-mission" style="font-weight:900; color:var(--gold); font-size:1.05rem; margin-top:3px;">
+            Level 1: Portal Walls
+          </div>
+        </div>
+
+        <div class="home-btns">
+          <button class="btn btn-fire" id="btn-play-campaign">▶ PLAY LEVEL</button>
+          <button class="btn btn-green" id="btn-play-endless">♾️ ENDLESS CLASSIC</button>
+          <button class="btn btn-cyan" onclick="goSlide(3)">🗺️ 350 LEVELS MAP</button>
+          <button class="btn btn-dark" onclick="goSlide(2)">🐍 SKINS & UPGRADES</button>
+          <button class="btn btn-dark" id="btn-reset" style="grid-column: 1 / -1;">🔄 RESET SAVE DATA</button>
+        </div>
+
+        <div style="margin-top:16px; font-size:0.78rem; color:#7e8ab0; line-height:1.4;">
+          <b>Controls:</b> Arrow Keys / WASD / On-Screen D-Pad / Swipe on Board.<br>
+          Hold <b>SPACE</b> or <b>BOOST Button</b> for 2x Snake Speed!
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: SNAKE SKINS & UPGRADES -->
+    <div class="slide" id="slide-2">
+      <div class="sec-head">
+        <h3>🐍 SNAKE LAB & SKINS</h3>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-dark" onclick="goSlide(1)" style="padding:7px 12px; font-size:0.78rem;">⬅ MENU</button>
+          <button class="btn btn-fire" onclick="goSlide(3)" style="padding:7px 12px; font-size:0.78rem;">🗺️ LEVELS</button>
+        </div>
+      </div>
+
+      <div class="skins-grid" id="skins-container"></div>
+
+      <h4 style="margin-bottom:8px; color:#9ba6c7;">⚡ POWER UPGRADES</h4>
+      <div class="upg-grid" id="upg-container"></div>
+    </div>
+
+    <!-- SLIDE 3: 350 LEVELS MAP -->
+    <div class="slide" id="slide-3">
+      <div class="sec-head">
+        <h3>🗺️ 350 TWIST LEVELS</h3>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-cyan" id="btn-unlock-350" style="padding:7px 10px; font-size:0.75rem;">🔓 UNLOCK ALL 350</button>
+          <button class="btn btn-dark" onclick="goSlide(1)" style="padding:7px 10px; font-size:0.75rem;">⬅ MENU</button>
+        </div>
+      </div>
+
+      <div class="ch-tabs" id="ch-tabs"></div>
+      <div class="lvl-grid" id="lvl-grid"></div>
+    </div>
+
+    <!-- SLIDE 4: SNAKE ARENA (GAMEPLAY) -->
+    <div class="slide" id="slide-4">
+      <div class="arena-hud">
+        <div class="hud-row">
+          <span>🎯 <b id="hud-mode">LVL 1</b></span>
+          <span>🍎 <b id="hud-apples">0 / 10</b></span>
+          <span>🛡️ <b id="hud-shields">1</b></span>
+          <span>🪙 <b id="hud-score">0</b></span>
+          <div style="display:flex; gap:5px;">
+            <button class="btn btn-dark" id="btn-pause" style="padding:4px 8px; font-size:0.72rem;">⏸</button>
+            <button class="btn btn-dark" onclick="goSlide(3)" style="padding:4px 8px; font-size:0.72rem;">✖</button>
+          </div>
+        </div>
+        <div class="twist-strip" id="hud-twist">TWIST: PORTAL WALLS</div>
+      </div>
+
+      <div class="canvas-holder">
+        <canvas id="snakeCanvas" width="400" height="400"></canvas>
+      </div>
+
+      <!-- ERGONOMIC CONTROL DECK (Never blocks the board) -->
+      <div class="control-deck">
+        <div class="dpad">
+          <div></div>
+          <button class="d-btn" id="d-up">▲</button>
+          <div></div>
+          <button class="d-btn" id="d-left">◀</button>
+          <button class="d-btn" id="d-down">▼</button>
+          <button class="d-btn" id="d-right">▶</button>
+        </div>
+
+        <div style="text-align:center; font-size:0.75rem; color:#8892b0; padding:0 6px;">
+          <div id="status-hint" style="color:var(--cyan); font-weight:800;">SWIPE OR USE D-PAD</div>
+          <div style="margin-top:3px;">Eat 🍎 • Avoid 💀</div>
+        </div>
+
+        <div class="action-pad">
+          <button class="dash-btn" id="btn-dash">⚡<br>BOOST</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: RESULTS -->
+    <div class="slide" id="slide-5">
+      <div class="res-box">
+        <h2 id="res-heading" style="font-size:1.8rem;">🏆 LEVEL CLEARED!</h2>
+        <p id="res-sub" style="color:#9ba6c7; margin-top:4px; font-weight:700;">Level 1 Completed</p>
+
+        <div class="res-list">
+          <div class="res-row"><span>Twist Challenge:</span> <span id="res-twist" style="color:var(--gold);">Portal</span></div>
+          <div class="res-row"><span>Apples Eaten:</span> <span id="res-apples">10</span></div>
+          <div class="res-row"><span>Coins Earned:</span> <span id="res-coins" style="color:var(--green);">+50</span></div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <button class="btn btn-fire" id="btn-next-level" style="grid-column: 1 / -1;">⏭ NEXT LEVEL</button>
+          <button class="btn btn-cyan" id="btn-replay">🔄 REPLAY</button>
+          <button class="btn btn-dark" onclick="goSlide(2)">🐍 SKINS</button>
+          <button class="btn btn-dark" onclick="goSlide(3)" style="grid-column: 1 / -1;">🗺️ 350 LEVEL MAP</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM 5-SLIDE NAVIGATION BAR -->
+  <div class="bottom-tabs">
+    <div class="b-tab active" id="tab-1" onclick="goSlide(1)">1. HOME</div>
+    <div class="b-tab" id="tab-2" onclick="goSlide(2)">2. SKINS</div>
+    <div class="b-tab" id="tab-3" onclick="goSlide(3)">3. 350 LEVELS</div>
+    <div class="b-tab" id="tab-4" onclick="startCampaignLevel(save.currentLevel)">4. ARENA</div>
+    <div class="b-tab" id="tab-5" onclick="goSlide(5)">5. RESULT</div>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   1. WEB AUDIO SYNTHESIZER (Zero External Assets Needed)
+   ========================================================= */
+const Sound = {
+  ctx: null,
+  on: true,
+  init() {
+    if (!this.ctx) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) this.ctx = new AC();
+    }
+    if (this.ctx && this.ctx.state === "suspended") this.ctx.resume();
+  },
+  beep(freq1, freq2, dur, type = "sine") {
+    if (!this.on) return;
+    this.init();
+    if (!this.ctx) return;
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq1, now);
+    osc.frequency.exponentialRampToValueAtTime(freq2, now + dur);
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.linearRampToValueAtTime(0.01, now + dur);
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + dur);
+  },
+  eat() { this.beep(520, 980, 0.11, "triangle"); },
+  poison() { this.beep(240, 80, 0.2, "sawtooth"); },
+  win() {
+    this.beep(440, 880, 0.25, "triangle");
+    setTimeout(() => this.beep(660, 1100, 0.25, "triangle"), 120);
+  },
+  crash() { this.beep(160, 45, 0.3, "sawtooth"); },
+  click() { this.beep(600, 320, 0.05, "sine"); }
+};
+
+/* =========================================================
+   2. SKINS & 350 TWIST LEVELS GENERATOR
+   ========================================================= */
+const SKINS = [
+  { id: 0, name: "Fire Viper", head: "#ff3d00", body: "#ff9100", price: 0 },
+  { id: 1, name: "Cyber Cobra", head: "#00e5ff", body: "#0072ff", price: 200 },
+  { id: 2, name: "Toxic Mamba", head: "#00e676", body: "#00b248", price: 500 },
+  { id: 3, name: "Plasma Dragon", head: "#d500f9", body: "#651fff", price: 1000 },
+  { id: 4, name: "Golden Hydra", head: "#ffd700", body: "#ff6d00", price: 2200 }
+];
+
+const TWISTS = [
+  { id: "PORTAL_WALLS", name: "Portal Borders", desc: "Walls wrap around! Cross one side to exit the opposite side." },
+  { id: "POISON_SKULLS", name: "Poison Skulls", desc: "Avoid purple skulls! They relocate every time you eat an apple." },
+  { id: "MOVING_FIRE", name: "Moving Fireblocks", desc: "Blazing fire blocks patrol across the arena!" },
+  { id: "TELEPORT_APPLE", name: "Blinking Apple", desc: "Eat the apple before its countdown ring vanishes and it teleports!" },
+  { id: "WORMHOLES", name: "Twin Wormholes", desc: "Enter the Blue Portal to warp out of the Orange Portal!" },
+  { id: "BLACKOUT_TORCH", name: "Darkness Torch", desc: "Pitch black arena! Only the glow around your snake head is visible." },
+  { id: "BOMB_TRAIL", name: "Mine Dropper", desc: "Every apple eaten drops a static fire mine at your tail's end!" },
+  { id: "LASER_SWEEP", name: "Cyber Laser", desc: "Watch the red warning line! A laser beam fires across that row." },
+  { id: "MIRROR_PULSE", name: "Mirror Controls", desc: "Every 8 seconds controls invert briefly when screen border turns purple!" },
+  { id: "RIVAL_SNAKE", name: "AI Cyber Bot", desc: "A yellow drone-snake roams the arena and steals apples!" },
+  { id: "SPEED_FRENZY", name: "Hyper Overdrive", desc: "Each apple eaten boosts snake speed!" },
+  { id: "FORTRESS_MAZE", name: "Fortress Pillars", desc: "Solid stone pillars block the center of the arena." }
+];
+
+function getLevelData(lvl) {
+  const n = Math.max(1, Math.min(350, lvl));
+  const t1 = TWISTS[(n - 1) % TWISTS.length];
+  const hasCombo = n > 30 && (n % 4 === 0);
+  const t2 = TWISTS[(n * 5 + 2) % TWISTS.length];
+  const combo = hasCombo && t2.id !== t1.id ? t2 : null;
+
+  return {
+    level: n,
+    primary: t1,
+    secondary: combo,
+    title: combo ? `${t1.name} + ${combo.name}` : t1.name,
+    desc: combo ? `${t1.desc} + ${t2.desc}` : t1.desc,
+    targetApples: 6 + Math.min(24, Math.floor(n / 12)),
+    tickMs: Math.max(78, 145 - Math.floor(n * 0.16)),
+    reward: 30 + n * 5
+  };
+}
+
+/* =========================================================
+   3. SAVE STATE & PERSISTENCE
+   ========================================================= */
+const defaultSave = {
+  coins: 100,
+  maxLevel: 1,
+  currentLevel: 1,
+  skin: 0,
+  ownedSkins: [0],
+  upgrades: { shield: 1, magnet: 1, multiplier: 1 },
+  chapter: 0
+};
+
+let save = JSON.parse(localStorage.getItem("FIREMOODON_SNAKE_SAVE") || "null") || JSON.parse(JSON.stringify(defaultSave));
+
+function writeSave() {
+  localStorage.setItem("FIREMOODON_SNAKE_SAVE", JSON.stringify(save));
+  refreshHeader();
+}
+
+function refreshHeader() {
+  document.getElementById("top-coins").textContent = save.coins;
+  document.getElementById("top-lvl").textContent = save.maxLevel;
+  const info = getLevelData(save.currentLevel);
+  document.getElementById("menu-mission").textContent = `Level ${info.level}: ${info.title} (${info.targetApples} 🍎)`;
+}
+
+/* =========================================================
+   4. SLIDE NAVIGATION & UI BUILDERS
+   ========================================================= */
+function goSlide(n) {
+  Sound.click();
+  if (n !== 4) stopSnakeGame();
+  for (let i = 1; i <= 5; i++) {
+    document.getElementById(`slide-${i}`).classList.toggle("active", i === n);
+    document.getElementById(`tab-${i}`).classList.toggle("active", i === n);
+  }
+  if (n === 1) refreshHeader();
+  if (n === 2) renderShop();
+  if (n === 3) renderLevelMap();
+}
+
+function renderShop() {
+  const sc = document.getElementById("skins-container");
+  sc.innerHTML = "";
+  SKINS.forEach(sk => {
+    const owned = save.ownedSkins.includes(sk.id);
+    const active = save.skin === sk.id;
+    const div = document.createElement("div");
+    div.className = `skin-card ${active ? "selected" : ""}`;
+    div.innerHTML = `
+      <div style="font-weight:800; font-size:0.88rem;">${sk.name}</div>
+      <div class="snake-preview">
+        <div class="seg-dot" style="background:${sk.head}; transform:scale(1.15);"></div>
+        <div class="seg-dot" style="background:${sk.body};"></div>
+        <div class="seg-dot" style="background:${sk.body}; opacity:0.8;"></div>
+      </div>
+      <button class="btn ${active ? "btn-green" : owned ? "btn-cyan" : "btn-fire"}" style="padding:7px; font-size:0.75rem;">
+        ${active ? "✔ EQUIPPED" : owned ? "EQUIP" : "🪙 " + sk.price}
+      </button>
+    `;
+    div.querySelector("button").onclick = () => {
+      if (owned) {
+        save.skin = sk.id;
+        writeSave();
+        renderShop();
+        Sound.click();
+      } else if (save.coins >= sk.price) {
+        save.coins -= sk.price;
+        save.ownedSkins.push(sk.id);
+        save.skin = sk.id;
+        writeSave();
+        renderShop();
+        Sound.win();
+      } else {
+        Sound.crash();
+        alert("Not enough coins! Eat apples and clear levels to earn coins.");
+      }
+    };
+    sc.appendChild(div);
+  });
+
+  const uc = document.getElementById("upg-container");
+  uc.innerHTML = "";
+  const list = [
+    { key: "shield", title: "Shield Armor (Extra Hits)", cost: 120 },
+    { key: "magnet", title: "Apple Pickup Radius", cost: 120 },
+    { key: "multiplier", title: "Coin Reward Multiplier", cost: 120 }
+  ];
+  list.forEach(u => {
+    const lvl = save.upgrades[u.key];
+    const maxed = lvl >= 5;
+    const price = u.cost * lvl;
+    const card = document.createElement("div");
+    card.className = "upg-card";
+    card.innerHTML = `
+      <div style="display:flex; justify-content:space-between; font-size:0.84rem; font-weight:800;">
+        <span>${u.title}</span>
+        <span style="color:var(--gold);">LVL ${lvl}/5</span>
+      </div>
+      <div class="bar-bg"><div class="bar-fill" style="width:${lvl * 20}%"></div></div>
+      <button class="btn ${maxed ? "btn-dark" : "btn-fire"}" style="padding:7px; font-size:0.76rem;">
+        ${maxed ? "MAX LEVEL" : "UPGRADE (🪙 " + price + ")"}
+      </button>
+    `;
+    card.querySelector("button").onclick = () => {
+      if (maxed) return;
+      if (save.coins >= price) {
+        save.coins -= price;
+        save.upgrades[u.key]++;
+        writeSave();
+        renderShop();
+        Sound.eat();
+      } else {
+        Sound.crash();
+        alert("Not enough coins!");
+      }
+    };
+    uc.appendChild(card);
+  });
+}
+
+function renderLevelMap() {
+  const tabs = document.getElementById("ch-tabs");
+  const grid = document.getElementById("lvl-grid");
+  tabs.innerHTML = "";
+  grid.innerHTML = "";
+
+  for (let c = 0; c < 7; c++) {
+    const s = c * 50 + 1;
+    const e = (c + 1) * 50;
+    const t = document.createElement("div");
+    t.className = `ch-tab ${save.chapter === c ? "active" : ""}`;
+    t.textContent = `Ch ${c + 1} (${s}-${e})`;
+    t.onclick = () => {
+      save.chapter = c;
+      renderLevelMap();
+      Sound.click();
+    };
+    tabs.appendChild(t);
+  }
+
+  const start = save.chapter * 50 + 1;
+  for (let l = start; l < start + 50; l++) {
+    const d = getLevelData(l);
+    const locked = l > save.maxLevel;
+    const card = document.createElement("div");
+    card.className = `lvl-card ${locked ? "locked" : ""}`;
+    card.innerHTML = `
+      <div style="display:flex; justify-content:space-between; font-weight:900; font-size:0.9rem;">
+        <span>LVL ${l}</span>
+        <span>${locked ? "🔒" : "🐍"}</span>
+      </div>
+      <div class="twist-tag">${d.title}</div>
+      <div style="font-size:0.7rem; color:#8892b0;">Goal: ${d.targetApples} 🍎</div>
+    `;
+    card.onclick = () => {
+      if (locked) { Sound.crash(); return; }
+      save.currentLevel = l;
+      writeSave();
+      startCampaignLevel(l);
+    };
+    grid.appendChild(card);
+  }
+}
+
+/* =========================================================
+   5. SNAKE GAME ENGINE (SLIDE 4)
+   ========================================================= */
+const canvas = document.getElementById("snakeCanvas");
+const ctx = canvas.getContext("2d");
+const GRID = 20; // 20x20 grid
+
+let game = null;
+let loopTimer = null;
+let animFrame = null;
+
+function fitCanvas() {
+  const holder = canvas.parentElement;
+  const size = Math.max(240, Math.min(holder.clientWidth - 8, holder.clientHeight - 8, 440));
+  canvas.width = size;
+  canvas.height = size;
+}
+window.addEventListener("resize", () => { if (game) fitCanvas(); });
+
+function hasTwist(id) {
+  if (!game || game.endless) return id === "PORTAL_WALLS";
+  return game.cfg.primary.id === id || (game.cfg.secondary && game.cfg.secondary.id === id);
+}
+
+function startCampaignLevel(lvl) {
+  initSnakeGame(lvl, false);
+}
+
+function startEndlessGame() {
+  initSnakeGame(1, true);
+}
+
+function initSnakeGame(lvl, endless) {
+  goSlide(4);
+  fitCanvas();
+
+  const cfg = getLevelData(lvl);
+  const skin = SKINS[save.skin] || SKINS[0];
+
+  game = {
+    endless,
+    cfg,
+    skin,
+    paused: false,
+    boosting: false,
+    tickCount: 0,
+    applesEaten: 0,
+    coinsEarned: 0,
+    shields: save.upgrades.shield,
+    snake: [
+      { x: 10, y: 12 },
+      { x: 10, y: 13 },
+      { x: 10, y: 14 }
+    ],
+    dir: { x: 0, y: -1 },
+    dirQueue: [],
+    apple: { x: 10, y: 5, timer: 45 },
+    skulls: [],
+    blocks: [],
+    movingBlocks: [],
+    portals: null,
+    laser: { row: -1, charge: 0 },
+    mirrorOn: false,
+    rival: null,
+    particles: []
+  };
+
+  // Setup Level-Specific Obstacles
+  if (hasTwist("FORTRESS_MAZE")) {
+    const coords = [
+      [5,5],[6,5],[13,5],[14,5],
+      [5,14],[6,14],[13,14],[14,14]
+    ];
+    coords.forEach(([x, y]) => game.blocks.push({ x, y }));
+  }
+
+  if (hasTwist("MOVING_FIRE")) {
+    game.movingBlocks.push({ x: 4, y: 7, vx: 1, vy: 0 });
+    game.movingBlocks.push({ x: 15, y: 13, vx: -1, vy: 0 });
+  }
+
+  if (hasTwist("POISON_SKULLS")) {
+    spawnSkulls(3);
+  }
+
+  if (hasTwist("WORMHOLES")) {
+    game.portals = {
+      a: { x: 3, y: 4, color: "#00e5ff" },
+      b: { x: 16, y: 15, color: "#ff9100" }
+    };
+  }
+
+  if (hasTwist("RIVAL_SNAKE")) {
+    game.rival = [
+      { x: 3, y: 3 },
+      { x: 3, y: 2 },
+      { x: 3, y: 1 }
+    ];
+  }
+
+  placeApple();
+  updateArenaHUD();
+
+  document.getElementById("hud-mode").textContent = endless ? "♾️ ENDLESS" : `LVL ${cfg.level}`;
+  document.getElementById("hud-twist").textContent = endless
+    ? "ENDLESS MODE: PORTAL WALLS + HIGH SCORE HUNT"
+    : `⚡ TWIST: ${cfg.title.toUpperCase()} — ${cfg.desc}`;
+
+  stopSnakeGame();
+  scheduleNextTick();
+  renderLoop();
+}
+
+function stopSnakeGame() {
+  if (loopTimer) clearTimeout(loopTimer);
+  if (animFrame) cancelAnimationFrame(animFrame);
+  loopTimer = null;
+  animFrame = null;
+}
+
+function scheduleNextTick() {
+  if (!game) return;
+  let speed = game.cfg.tickMs;
+  if (hasTwist("SPEED_FRENZY")) {
+    speed = Math.max(65, speed - game.applesEaten * 4);
+  }
+  if (game.boosting) {
+    speed = Math.max(48, Math.floor(speed * 0.55));
+  }
+  loopTimer = setTimeout(() => {
+    if (game && !game.paused) stepSnake();
+    if (game) scheduleNextTick();
+  }, speed);
+}
+
+function cellOccupied(x, y) {
+  if (game.snake.some(s => s.x === x && s.y === y)) return true;
+  if (game.blocks.some(b => b.x === x && b.y === y)) return true;
+  if (game.skulls.some(k => k.x === x && k.y === y)) return true;
+  if (game.portals && ((game.portals.a.x === x && game.portals.a.y === y) || (game.portals.b.x === x && game.portals.b.y === y))) return true;
+  return false;
+}
+
+function placeApple() {
+  for (let tries = 0; tries < 200; tries++) {
+    const x = Math.floor(Math.random() * GRID);
+    const y = Math.floor(Math.random() * GRID);
+    if (!cellOccupied(x, y)) {
+      game.apple = { x, y, timer: 42 };
+      return;
+    }
+  }
+}
+
+function spawnSkulls(count) {
+  game.skulls = [];
+  for (let i = 0; i < count; i++) {
+    for (let t = 0; t < 100; t++) {
+      const x = Math.floor(Math.random() * GRID);
+      const y = Math.floor(Math.random() * GRID);
+      if (!cellOccupied(x, y) && Math.abs(x - game.snake[0].x) + Math.abs(y - game.snake[0].y) > 3) {
+        game.skulls.push({ x, y });
+        break;
+      }
+    }
+  }
+}
+
+function queueDirection(nx, ny) {
+  if (!game || game.paused) return;
+  if (game.mirrorOn) {
+    nx = -nx;
+    ny = -ny;
+  }
+  const lastDir = game.dirQueue.length > 0 ? game.dirQueue[game.dirQueue.length - 1] : game.dir;
+  // Prevent 180-degree self-reversal
+  if (lastDir.x + nx === 0 && lastDir.y + ny === 0) return;
+  if (game.dirQueue.length < 2) {
+    game.dirQueue.push({ x: nx, y: ny });
+  }
+}
+
+function stepSnake() {
+  const g = game;
+  g.tickCount++;
+
+  // Mirror Controls Twist toggles every 30 ticks
+  if (hasTwist("MIRROR_PULSE")) {
+    g.mirrorOn = Math.floor(g.tickCount / 28) % 2 === 1;
+  } else {
+    g.mirrorOn = false;
+  }
+
+  // Consume Queued Direction
+  if (g.dirQueue.length > 0) {
+    g.dir = g.dirQueue.shift();
+  }
+
+  // Move Moving Fireblocks
+  g.movingBlocks.forEach(mb => {
+    mb.x += mb.vx;
+    mb.y += mb.vy;
+    if (mb.x <= 1 || mb.x >= GRID - 2) mb.vx *= -1;
+  });
+
+  // Laser Sweep Twist
+  if (hasTwist("LASER_SWEEP")) {
+    if (g.laser.row === -1 && g.tickCount % 25 === 0) {
+      g.laser.row = Math.floor(Math.random() * GRID);
+      g.laser.charge = 10;
+    } else if (g.laser.row !== -1) {
+      g.laser.charge--;
+      if (g.laser.charge <= 0) {
+        if (g.snake[0].y === g.laser.row) {
+          if (!absorbWithShield()) return endSnakeGame(false);
+        }
+        g.laser.row = -1;
+      }
+    }
+  }
+
+  // Teleporting Apple Twist
+  if (hasTwist("TELEPORT_APPLE")) {
+    g.apple.timer--;
+    if (g.apple.timer <= 0) placeApple();
+  }
+
+  // Calculate Next Head Position
+  let nx = g.snake[0].x + g.dir.x;
+  let ny = g.snake[0].y + g.dir.y;
+
+  // Wall Handling (Portal Twist vs Solid Walls)
+  const wrapWalls = hasTwist("PORTAL_WALLS") || g.endless;
+  if (nx < 0 || nx >= GRID || ny < 0 || ny >= GRID) {
+    if (wrapWalls) {
+      nx = (nx + GRID) % GRID;
+      ny = (ny + GRID) % GRID;
+    } else {
+      if (!absorbWithShield()) return endSnakeGame(false);
+      // Bounce safely inside
+      nx = (nx + GRID) % GRID;
+      ny = (ny + GRID) % GRID;
+    }
+  }
+
+  // Wormholes Teleportation
+  if (g.portals) {
+    if (nx === g.portals.a.x && ny === g.portals.a.y) {
+      nx = g.portals.b.x + g.dir.x;
+      ny = g.portals.b.y + g.dir.y;
+    } else if (nx === g.portals.b.x && ny === g.portals.b.y) {
+      nx = g.portals.a.x + g.dir.x;
+      ny = g.portals.a.y + g.dir.y;
+    }
+    nx = (nx + GRID) % GRID;
+    ny = (ny + GRID) % GRID;
+  }
+
+  // Check Hazard Collisions (Self, Blocks, Moving Fire, Skulls)
+  const hitSelf = g.snake.slice(0, -1).some(s => s.x === nx && s.y === ny);
+  const hitBlock = g.blocks.some(b => b.x === nx && b.y === ny);
+  const hitFire = g.movingBlocks.some(m => m.x === nx && m.y === ny);
+  const hitSkull = g.skulls.some(k => k.x === nx && k.y === ny);
+
+  if (hitSelf || hitBlock || hitFire || hitSkull) {
+    if (!absorbWithShield()) return endSnakeGame(false);
+  }
+
+  // Advance Snake Head
+  g.snake.unshift({ x: nx, y: ny });
+
+  // Magnet Upgrade Check (Eat apple if adjacent when magnet > 1)
+  const distToApple = Math.abs(nx - g.apple.x) + Math.abs(ny - g.apple.y);
+  const magnetRange = save.upgrades.magnet >= 3 ? 1 : 0;
+
+  if ((nx === g.apple.x && ny === g.apple.y) || (magnetRange > 0 && distToApple <= 1)) {
+    Sound.eat();
+    g.applesEaten++;
+    const coinGain = 4 * save.upgrades.multiplier;
+    g.coinsEarned += coinGain;
+    spawnBurst(g.apple.x, g.apple.y, "#00e676");
+
+    // Bomb Trail Twist drops a block behind tail on every 2nd apple
+    if (hasTwist("BOMB_TRAIL") && g.applesEaten % 2 === 0) {
+      const tail = g.snake[g.snake.length - 1];
+      g.blocks.push({ x: tail.x, y: tail.y });
+    }
+
+    if (hasTwist("POISON_SKULLS")) spawnSkulls(3);
+
+    if (!g.endless && g.applesEaten >= g.cfg.targetApples) {
+      updateArenaHUD();
+      return endSnakeGame(true);
+    }
+    placeApple();
+  } else {
+    g.snake.pop();
+  }
+
+  // Rival AI Snake Step
+  if (g.rival) {
+    const rh = g.rival[0];
+    const dx = Math.sign(g.apple.x - rh.x);
+    const dy = Math.sign(g.apple.y - rh.y);
+    const rnx = (rh.x + (dx !== 0 ? dx : 0) + GRID) % GRID;
+    const rny = (rh.y + (dx === 0 ? dy : 0) + GRID) % GRID;
+    g.rival.unshift({ x: rnx, y: rny });
+    if (rnx === g.apple.x && rny === g.apple.y) {
+      placeApple();
+    } else {
+      g.rival.pop();
+    }
+  }
+
+  updateArenaHUD();
+}
+
+function absorbWithShield() {
+  if (game.shields > 1) {
+    game.shields--;
+    Sound.poison();
+    spawnBurst(game.snake[0].x, game.snake[0].y, "#00e5ff");
+    updateArenaHUD();
+    return true;
+  }
+  return false;
+}
+
+function spawnBurst(gx, gy, color) {
+  const cell = canvas.width / GRID;
+  const cx = (gx + 0.5) * cell;
+  const cy = (gy + 0.5) * cell;
+  for (let i = 0; i < 14; i++) {
+    game.particles.push({
+      x: cx,
+      y: cy,
+      vx: (Math.random() - 0.5) * 6,
+      vy: (Math.random() - 0.5) * 6,
+      life: 18,
+      color
+    });
+  }
+}
+
+function updateArenaHUD() {
+  if (!game) return;
+  document.getElementById("hud-apples").textContent = game.endless
+    ? `${game.applesEaten}`
+    : `${game.applesEaten} / ${game.cfg.targetApples}`;
+  document.getElementById("hud-shields").textContent = game.shields;
+  document.getElementById("hud-score").textContent = game.coinsEarned;
+}
+
+function drawArena() {
+  if (!game) return;
+  const g = game;
+  const cell = canvas.width / GRID;
+
+  // Clear Board
+  ctx.fillStyle = "#06080e";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Subtle Grid Lines
+  ctx.strokeStyle = "rgba(255, 255, 255, 0.04)";
+  ctx.lineWidth = 1;
+  for (let i = 1; i < GRID; i++) {
+    ctx.beginPath();
+    ctx.moveTo(i * cell, 0);
+    ctx.lineTo(i * cell, canvas.height);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, i * cell);
+    ctx.lineTo(canvas.width, i * cell);
+    ctx.stroke();
+  }
+
+  // Portal Border Glow if Wrap Around
+  if (hasTwist("PORTAL_WALLS") || g.endless) {
+    ctx.strokeStyle = "rgba(0, 229, 255, 0.55)";
+    ctx.lineWidth = 4;
+    ctx.strokeRect(2, 2, canvas.width - 4, canvas.height - 4);
+  }
+
+  // Mirror Pulse Warning Border
+  if (g.mirrorOn) {
+    ctx.strokeStyle = "#d500f9";
+    ctx.lineWidth = 6;
+    ctx.strokeRect(3, 3, canvas.width - 6, canvas.height - 6);
+  }
+
+  // Wormhole Portals
+  if (g.portals) {
+    [g.portals.a, g.portals.b].forEach(pt => {
+      ctx.fillStyle = pt.color;
+      ctx.beginPath();
+      ctx.arc((pt.x + 0.5) * cell, (pt.y + 0.5) * cell, cell * 0.45, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    });
+  }
+
+  // Laser Row Warning
+  if (g.laser.row !== -1) {
+    ctx.fillStyle = g.laser.charge <= 2 ? "rgba(255, 23, 68, 0.85)" : "rgba(255, 23, 68, 0.25)";
+    ctx.fillRect(0, g.laser.row * cell, canvas.width, cell);
+  }
+
+  // Static Blocks / Bombs
+  g.blocks.forEach(b => {
+    ctx.fillStyle = "#37474f";
+    ctx.fillRect(b.x * cell + 2, b.y * cell + 2, cell - 4, cell - 4);
+    ctx.strokeStyle = "#ff5252";
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(b.x * cell + 2, b.y * cell + 2, cell - 4, cell - 4);
+  });
+
+  // Moving Fireblocks
+  g.movingBlocks.forEach(mb => {
+    ctx.fillStyle = "#ff3d00";
+    ctx.beginPath();
+    ctx.arc((mb.x + 0.5) * cell, (mb.y + 0.5) * cell, cell * 0.44, 0, Math.PI * 2);
+    ctx.fill();
+  });
+
+  // Poison Skulls
+  g.skulls.forEach(sk => {
+    ctx.fillStyle = "#aa00ff";
+    ctx.beginPath();
+    ctx.arc((sk.x + 0.5) * cell, (sk.y + 0.5) * cell, cell * 0.42, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.fillStyle = "#fff";
+    ctx.font = `bold ${Math.floor(cell * 0.6)}px sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("×", (sk.x + 0.5) * cell, (sk.y + 0.5) * cell);
+  });
+
+  // Glowing Apple
+  const ax = (g.apple.x + 0.5) * cell;
+  const ay = (g.apple.y + 0.5) * cell;
+  ctx.fillStyle = "#ff1744";
+  ctx.beginPath();
+  ctx.arc(ax, ay, cell * 0.42, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = "#00e676";
+  ctx.fillRect(ax - 2, ay - cell * 0.48, 4, 5);
+
+  if (hasTwist("TELEPORT_APPLE")) {
+    ctx.strokeStyle = "#ffab00";
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.arc(ax, ay, cell * 0.48, 0, (Math.PI * 2) * (g.apple.timer / 42));
+    ctx.stroke();
+  }
+
+  // Rival AI Snake
+  if (g.rival) {
+    g.rival.forEach((seg, idx) => {
+      ctx.fillStyle = idx === 0 ? "#ffd600" : "#ffab00";
+      ctx.fillRect(seg.x * cell + 2, seg.y * cell + 2, cell - 4, cell - 4);
+    });
+  }
+
+  // Player Snake
+  g.snake.forEach((seg, idx) => {
+    const isHead = idx === 0;
+    ctx.fillStyle = isHead ? g.skin.head : g.skin.body;
+    const pad = isHead ? 1 : 2.5;
+    ctx.fillRect(seg.x * cell + pad, seg.y * cell + pad, cell - pad * 2, cell - pad * 2);
+
+    if (isHead) {
+      // Snake Eyes
+      ctx.fillStyle = "#fff";
+      ctx.beginPath();
+      ctx.arc((seg.x + 0.35) * cell, (seg.y + 0.35) * cell, cell * 0.12, 0, Math.PI * 2);
+      ctx.arc((seg.x + 0.65) * cell, (seg.y + 0.35) * cell, cell * 0.12, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+
+  // Particles
+  for (let i = g.particles.length - 1; i >= 0; i--) {
+    const pt = g.particles[i];
+    pt.x += pt.vx;
+    pt.y += pt.vy;
+    pt.life--;
+    ctx.fillStyle = pt.color;
+    ctx.fillRect(pt.x, pt.y, 4, 4);
+    if (pt.life <= 0) g.particles.splice(i, 1);
+  }
+
+  // Blackout Torchlight Twist
+  if (hasTwist("BLACKOUT_TORCH")) {
+    const hx = (g.snake[0].x + 0.5) * cell;
+    const hy = (g.snake[0].y + 0.5) * cell;
+    const grad = ctx.createRadialGradient(hx, hy, cell * 1.5, hx, hy, cell * 6.2);
+    grad.addColorStop(0, "rgba(0,0,0,0)");
+    grad.addColorStop(1, "rgba(4,6,12,0.95)");
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+  }
+
+  // Pause Overlay
+  if (g.paused) {
+    ctx.fillStyle = "rgba(8, 10, 16, 0.78)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 22px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("⏸ GAME PAUSED", canvas.width / 2, canvas.height / 2);
+  }
+}
+
+function renderLoop() {
+  if (!game) return;
+  drawArena();
+  animFrame = requestAnimationFrame(renderLoop);
+}
+
+/* =========================================================
+   6. END GAME & SLIDE 5 RESULTS
+   ========================================================= */
+function endSnakeGame(won) {
+  const g = game;
+  stopSnakeGame();
+
+  const clearBonus = won ? g.cfg.reward : 0;
+  const totalCoins = g.coinsEarned + clearBonus;
+  save.coins += totalCoins;
+
+  if (won) {
+    Sound.win();
+    if (!g.endless && g.cfg.level >= save.maxLevel && save.maxLevel < 350) {
+      save.maxLevel = g.cfg.level + 1;
+    }
+  } else {
+    Sound.crash();
+  }
+  writeSave();
+
+  document.getElementById("res-heading").textContent = won ? "🏆 LEVEL CLEARED!" : "💥 SNAKE CRASHED!";
+  document.getElementById("res-heading").style.color = won ? "var(--green)" : "var(--fire)";
+  document.getElementById("res-sub").textContent = g.endless
+    ? "Endless Classic Run Finished"
+    : `Level ${g.cfg.level} — ${won ? "Mission Complete" : "Try Again"}`;
+  document.getElementById("res-twist").textContent = g.endless ? "Endless Portal" : g.cfg.title;
+  document.getElementById("res-apples").textContent = `${g.applesEaten} 🍎`;
+  document.getElementById("res-coins").textContent = `+${totalCoins} 🪙`;
+
+  const nextBtn = document.getElementById("btn-next-level");
+  if (won && !g.endless && g.cfg.level < 350) {
+    nextBtn.style.display = "inline-flex";
+    nextBtn.onclick = () => {
+      save.currentLevel = g.cfg.level + 1;
+      writeSave();
+      startCampaignLevel(save.currentLevel);
+    };
+  } else {
+    nextBtn.style.display = "none";
+  }
+
+  document.getElementById("btn-replay").onclick = () => {
+    if (g.endless) startEndlessGame();
+    else startCampaignLevel(g.cfg.level);
+  };
+
+  goSlide(5);
+}
+
+/* =========================================================
+   7. ALL CONTROLS: KEYBOARD, D-PAD, SWIPE & UI BUTTONS
+   ========================================================= */
+window.addEventListener("keydown", e => {
+  if (e.key === "ArrowUp" || e.key === "w" || e.key === "W") { e.preventDefault(); queueDirection(0, -1); }
+  if (e.key === "ArrowDown" || e.key === "s" || e.key === "S") { e.preventDefault(); queueDirection(0, 1); }
+  if (e.key === "ArrowLeft" || e.key === "a" || e.key === "A") { e.preventDefault(); queueDirection(-1, 0); }
+  if (e.key === "ArrowRight" || e.key === "d" || e.key === "D") { e.preventDefault(); queueDirection(1, 0); }
+  if (e.key === " " && game) { e.preventDefault(); game.boosting = true; }
+});
+
+window.addEventListener("keyup", e => {
+  if (e.key === " " && game) { game.boosting = false; }
+});
+
+// D-Pad Buttons
+function bindDirBtn(id, dx, dy) {
+  const btn = document.getElementById(id);
+  const trigger = (e) => { e.preventDefault(); queueDirection(dx, dy); };
+  btn.addEventListener("touchstart", trigger, { passive: false });
+  btn.addEventListener("mousedown", trigger);
+}
+bindDirBtn("d-up", 0, -1);
+bindDirBtn("d-down", 0, 1);
+bindDirBtn("d-left", -1, 0);
+bindDirBtn("d-right", 1, 0);
+
+// Boost Hold Button
+const dashBtn = document.getElementById("btn-dash");
+const startBoost = (e) => { e.preventDefault(); if (game) game.boosting = true; };
+const endBoost = (e) => { e.preventDefault(); if (game) game.boosting = false; };
+dashBtn.addEventListener("touchstart", startBoost, { passive: false });
+dashBtn.addEventListener("touchend", endBoost, { passive: false });
+dashBtn.addEventListener("mousedown", startBoost);
+dashBtn.addEventListener("mouseup", endBoost);
+dashBtn.addEventListener("mouseleave", endBoost);
+
+// Swipe Gesture on Canvas
+let touchStartX = 0, touchStartY = 0;
+canvas.addEventListener("touchstart", e => {
+  const t = e.touches[0];
+  touchStartX = t.clientX;
+  touchStartY = t.clientY;
+}, { passive: true });
+
+canvas.addEventListener("touchend", e => {
+  const t = e.changedTouches[0];
+  const dx = t.clientX - touchStartX;
+  const dy = t.clientY - touchStartY;
+  if (Math.abs(dx) < 18 && Math.abs(dy) < 18) return;
+  if (Math.abs(dx) > Math.abs(dy)) {
+    queueDirection(dx > 0 ? 1 : -1, 0);
+  } else {
+    queueDirection(0, dy > 0 ? 1 : -1);
+  }
+}, { passive: true });
+
+// Menu & Action Buttons
+document.getElementById("btn-play-campaign").onclick = () => startCampaignLevel(save.currentLevel);
+document.getElementById("btn-play-endless").onclick = () => startEndlessGame();
+
+document.getElementById("btn-pause").onclick = () => {
+  if (!game) return;
+  game.paused = !game.paused;
+  Sound.click();
+};
+
+document.getElementById("btn-mute").onclick = (e) => {
+  Sound.on = !Sound.on;
+  e.target.textContent = Sound.on ? "🔊 ON" : "🔇 OFF";
+  Sound.click();
+};
+
+document.getElementById("btn-unlock-350").onclick = () => {
+  save.maxLevel = 350;
+  writeSave();
+  renderLevelMap();
+  Sound.win();
+};
+
+document.getElementById("btn-reset").onclick = () => {
+  if (confirm("Reset all coins, skins, and 350 levels progress?")) {
+    save = JSON.parse(JSON.stringify(defaultSave));
+    writeSave();
+    goSlide(1);
+  }
+};
+
+// Initialize
+refreshHeader();
+</script>
+</body>
+</html>
